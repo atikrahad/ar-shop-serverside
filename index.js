@@ -40,6 +40,13 @@ async function run() {
         const allproducts = productscollection.find()
         const result = await allproducts.toArray()
         res.send(result)
+    });
+
+    app.get('/products/:brand', async(req, res)=> {
+        const brand = req.params.brand;
+        const filterdata = productscollection.find({brand: brand})
+        const result = await filterdata.toArray()
+        res.send(result)
     })
 
     // Send a ping to confirm a successful connection
