@@ -29,19 +29,27 @@ async function run() {
     const database = client.db("productsDB");
     const productscollection = database.collection("products");
 
+    const cartdatabase = client.db("cartDB");
+    const cartcollection = cartdatabase.collection("cart");
+
+    app.get("/cart", async (req, res) => {
+      const getcartdata = cartcollection.find();
+      const result = await getcartdata.toArray();
+      console.log(result);
+      res.send(result);
+    });
+
     app.get("/products", async (req, res) => {
       const allproducts = productscollection.find();
       const result = await allproducts.toArray();
       res.send(result);
     });
 
-    
-
-    app.get("/products/:id", async (req, res) => {
+    app.get("/:brand/:id", async (req, res) => {
       const productid = req.params.id;
-      const quary = {_id: new ObjectId(productid)}
+      const quary = { _id: new ObjectId(productid) };
       const filterdata = await productscollection.findOne(quary);
-      
+
       res.send(filterdata);
     });
 
@@ -52,8 +60,6 @@ async function run() {
       res.send(result);
     });
 
-    
-
     app.post("/products", async (req, res) => {
       const products = req.body;
       const result = await productscollection.insertOne(products);
@@ -61,7 +67,20 @@ async function run() {
       console.log(products);
     });
 
+    app.delete("/products/:id", async(req, res)=> {
+        const id = req.params.id;
+        const quairy = {_id: new ObjectId(id)}
+        const result = await productscollection.deleteOne(quairy)
+        res.send(result)
+    })
+
     
+
+    app.post("/cart", async (req, res) => {
+      const addcart = req.body;
+      const result = await cartcollection.insertOne(addcart);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
