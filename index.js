@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 require("dotenv").config();
 
@@ -29,6 +29,31 @@ async function run() {
     const database = client.db("productsDB");
     const productscollection = database.collection("products");
 
+    app.get("/products", async (req, res) => {
+      const allproducts = productscollection.find();
+      const result = await allproducts.toArray();
+      res.send(result);
+    });
+
+    
+
+    app.get("/products/:id", async (req, res) => {
+      const productid = req.params.id;
+      const quary = {_id: new ObjectId(productid)}
+      const filterdata = await productscollection.findOne(quary);
+      
+      res.send(filterdata);
+    });
+
+    app.get("/:brand", async (req, res) => {
+      const brand = req.params.brand;
+      const filterdata = productscollection.find({ brand: brand });
+      const result = await filterdata.toArray();
+      res.send(result);
+    });
+
+    
+
     app.post("/products", async (req, res) => {
       const products = req.body;
       const result = await productscollection.insertOne(products);
@@ -36,18 +61,7 @@ async function run() {
       console.log(products);
     });
 
-    app.get('/products', async(req, res)=> {
-        const allproducts = productscollection.find()
-        const result = await allproducts.toArray()
-        res.send(result)
-    });
-
-    app.get('/products/:brand', async(req, res)=> {
-        const brand = req.params.brand;
-        const filterdata = productscollection.find({brand: brand})
-        const result = await filterdata.toArray()
-        res.send(result)
-    })
+    
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
