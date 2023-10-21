@@ -35,6 +35,14 @@ async function run() {
     app.get("/cart", async (req, res) => {
       const getcartdata = cartcollection.find();
       const result = await getcartdata.toArray();
+      
+      res.send(result);
+    });
+    
+    app.get("/cart/:id", async (req, res) => {
+      const id = req.params.id
+      const quairy = {_id: id}
+      const result = await cartcollection.deleteOne(quairy)
       console.log(result);
       res.send(result);
     });
