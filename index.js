@@ -75,6 +75,29 @@ async function run() {
       console.log(products);
     });
 
+
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id
+      const product = req.body;
+      
+      console.log(product);
+      const quairy = {_id: new ObjectId(id)}
+      const option = {upsert: true}
+      const updateProduct = {
+        $set: {
+          img: product.img,
+          brand: product.brand,
+          title: product.title,
+          price: product.price,
+          rating: product.rating,
+          description: product.description,
+          category: product.category,
+        }
+      }
+      const result = await productscollection.updateOne(quairy, updateProduct, option )
+      res.send(result)
+    });
+
     app.delete("/products/:id", async(req, res)=> {
         const id = req.params.id;
         const quairy = {_id: new ObjectId(id)}
